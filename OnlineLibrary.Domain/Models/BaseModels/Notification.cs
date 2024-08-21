@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineLibrary.Domain.Models
+namespace OnlineLibrary.Domain.Models.BaseModels
 {
-    public class Book : BaseEntity
+    public class Notification : BaseEntity
     {
     }
 }
