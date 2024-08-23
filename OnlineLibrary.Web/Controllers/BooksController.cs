@@ -53,6 +53,8 @@ namespace OnlineLibrary.Web.Controllers
         // GET: Books/Create
         public IActionResult Create()
         {
+            ViewData["AuthorId"] = new SelectList(_AuthorService.GetAllAuthors(), "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_CategoryService.GetAllCategories(), "Id", "Name");
             return View();
         }
 
@@ -61,11 +63,13 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,BookName,BookImage,BookDescription,Price,Rating")] Book Book)
+        public IActionResult Create([Bind("Id, Title, AuthorId, ISBN, Description, ImageUrl, Year, Pages, Quantity, Available, CategoryId")] Book Book)
         {
             if (ModelState.IsValid)
             {
                 Book.Id = Guid.NewGuid();
+                Book.Author = _AuthorService.GetDetailsForAuthor(Book.AuthorId);
+                Book.Category = _CategoryService.GetDetailsForCategory(Book.CategoryId);
                 _BookService.CreateNewBook(Book);
                 return RedirectToAction(nameof(Index));
             }
@@ -117,6 +121,9 @@ namespace OnlineLibrary.Web.Controllers
             {
                 return NotFound();
             }
+
+            ViewData["AuthorId"] = new SelectList(_AuthorService.GetAllAuthors(), "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_CategoryService.GetAllCategories(), "Id", "Name");
             return View(Book);
         }
 
@@ -125,7 +132,7 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, [Bind("Id,BookName,BookImage,BookDescription,Price,Rating")] Book Book)
+        public IActionResult Edit(Guid id, [Bind("Id, Title, AuthorId, ISBN, Description, ImageUrl, Year, Pages, Quantity, Available, CategoryId")] Book Book)
         {
             if (id != Book.Id)
             {
@@ -134,6 +141,8 @@ namespace OnlineLibrary.Web.Controllers
 
             if (ModelState.IsValid)
             {
+                Book.Author = _AuthorService.GetDetailsForAuthor(Book.AuthorId);
+                Book.Category = _CategoryService.GetDetailsForCategory(Book.CategoryId);
                 try
                 {
                     _BookService.UpdeteExistingBook(Book);

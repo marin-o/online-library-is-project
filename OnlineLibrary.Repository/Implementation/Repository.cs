@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.PortableExecutable;
 
 namespace OnlineLibrary.Repository.Implementation
 {
@@ -23,12 +24,32 @@ namespace OnlineLibrary.Repository.Implementation
         }
         public IEnumerable<T> GetAll()
         {
-            return entities.AsEnumerable();
+            if (typeof(T).IsAssignableFrom(typeof(Book)))
+            {
+                return entities
+                    .Include("Author")
+                    .Include("Category")
+                    .AsEnumerable();
+            }
+            else
+            {
+                return entities.AsEnumerable();
+            }
         }
 
         public T Get(Guid? id)
         {
-            return entities.SingleOrDefault(s => s.Id == id);
+            if (typeof(T).IsAssignableFrom(typeof(Book)))
+            {
+                return entities
+                    .Include("Author")
+                    .Include("Category")
+                    .First(s => s.Id == id);
+            }
+            else
+            {
+                return entities.First(s => s.Id == id);
+            }
         }
         public void Insert(T entity)
         {
