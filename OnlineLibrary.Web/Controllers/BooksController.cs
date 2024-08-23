@@ -17,11 +17,20 @@ namespace OnlineLibrary.Web.Controllers
     {
         private readonly IBookService _BookService;
         private readonly IBorrowingCartService _BorrowingCartService;
+        private readonly IAuthorService _AuthorService;
+        private readonly ICategorySevice _CategoryService;
 
-        public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService)
+        public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService, IAuthorService authorService, ICategorySevice categoryService)
         {
             _BookService = bookService;
             _BorrowingCartService = borrowingCartService;
+            _AuthorService = authorService;
+            _CategoryService = categoryService;
+        }
+
+        public IActionResult Index()
+        {
+            return View(_BookService.GetAllBooks());
         }
 
         // GET: Books/Details/5
