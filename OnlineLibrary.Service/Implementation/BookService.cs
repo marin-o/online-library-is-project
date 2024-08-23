@@ -1,5 +1,6 @@
 ﻿using EShop.Repository.Interface;
 using OnlineLibrary.Domain.Models.BaseModels;
+using OnlineLibrary.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
