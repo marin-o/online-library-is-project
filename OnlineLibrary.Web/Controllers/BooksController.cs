@@ -1,56 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Models.BaseModels;
+using OnlineLibrary.Domain.Models.RelationalModels;
 using OnlineLibrary.Repository;
+using OnlineLibrary.Service.Interface;
 
 namespace OnlineLibrary.Web.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBookService _BookService;
+        private readonly IBorrowingCartService _BorrowingCartService;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService)
         {
-            _context = context;
-        }
-
-        // GET: Books
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Books.Include(b => b.Author).Include(b => b.Category);
-            return View(await applicationDbContext.ToListAsync());
+            _BookService = bookService;
+            _BorrowingCartService = borrowingCartService;
         }
 
         // GET: Books/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public IActionResult Details(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
+            var Book = _BookService.GetDetailsForBook(id);
+            if (Book == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(Book);
         }
 
         // GET: Books/Create
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Biography");
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
@@ -59,36 +52,63 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,AuthorId,ISBN,Description,ImageUrl,Year,Pages,Quantity,Available,CategoryId,Id")] Book book)
+        public IActionResult Create([Bind("Id,BookName,BookImage,BookDescription,Price,Rating")] Book Book)
         {
             if (ModelState.IsValid)
             {
-                book.Id = Guid.NewGuid();
-                _context.Add(book);
-                await _context.SaveChangesAsync();
+                Book.Id = Guid.NewGuid();
+                _BookService.CreateNewBook(Book);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Biography", book.AuthorId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+            return View(Book);
         }
 
-        // GET: Books/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult AddToCart(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
+            var Book = _BookService.GetDetailsForBook(id);
+
+            BookInBorrowingCart ps = new BookInBorrowingCart();
+
+            if (Book != null)
+            {
+                ps.BookId = Book.Id;
+            }
+
+            return View(ps);
+        }
+
+        [HttpPost]
+        public IActionResult AddToCartConfirmed(BookInBorrowingCart model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            _BorrowingCartService.AddToBorrowingConfirmed(model, userId);
+
+
+
+            return View("Index", _BookService.GetAllBooks());
+        }
+
+
+        // GET: Books/Edit/5
+        public IActionResult Edit(Guid? id)
+        {
+            if (id == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Biography", book.AuthorId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+
+            var Book = _BookService.GetDetailsForBook(id);
+            if (Book == null)
+            {
+                return NotFound();
+            }
+            return View(Book);
         }
 
         // POST: Books/Edit/5
@@ -96,9 +116,9 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Title,AuthorId,ISBN,Description,ImageUrl,Year,Pages,Quantity,Available,CategoryId,Id")] Book book)
+        public IActionResult Edit(Guid id, [Bind("Id,BookName,BookImage,BookDescription,Price,Rating")] Book Book)
         {
-            if (id != book.Id)
+            if (id != Book.Id)
             {
                 return NotFound();
             }
@@ -107,65 +127,41 @@ namespace OnlineLibrary.Web.Controllers
             {
                 try
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    _BookService.UpdeteExistingBook(Book);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookExists(book.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Biography", book.AuthorId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+            return View(Book);
         }
 
         // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        public IActionResult Delete(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
+            var Book = _BookService.GetDetailsForBook(id);
+            if (Book == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(Book);
         }
 
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book != null)
-            {
-                _context.Books.Remove(book);
-            }
-
-            await _context.SaveChangesAsync();
+            _BookService.DeleteBook(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool BookExists(Guid id)
-        {
-            return _context.Books.Any(e => e.Id == id);
         }
     }
 }
