@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineLibrary.Domain.Models
+namespace OnlineLibrary.Domain.Models.BaseModels
 {
-    public class Notification : BaseEntity
+    public class BaseEntity
     {
+        public Guid Id { get; set; }
     }
 }
