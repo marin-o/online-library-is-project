@@ -22,7 +22,7 @@ namespace OnlineLibrary.Web.Controllers
         // GET: BorrowingHistories
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.BorrowingHistories.Include(b => b.User);
+            var applicationDbContext = _context.BorrowingHistories.Include(b => b.Member);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace OnlineLibrary.Web.Controllers
             }
 
             var borrowingHistory = await _context.BorrowingHistories
-                .Include(b => b.User)
+                .Include(b => b.Member)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (borrowingHistory == null)
             {
@@ -132,7 +132,7 @@ namespace OnlineLibrary.Web.Controllers
             }
 
             var borrowingHistory = await _context.BorrowingHistories
-                .Include(b => b.User)
+                .Include(b => b.Member)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (borrowingHistory == null)
             {

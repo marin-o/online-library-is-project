@@ -15,20 +15,20 @@ namespace OnlineLibrary.Service.Implementation
 {
     public class BorrowingCartService : IBorrowingCartService
     {
-        private readonly IRepository<BorrowingCart> _BorrowingCartRepository;
-        private readonly IRepository<Book> _BookRepository;
-        private readonly IRepository<BorrowingHistory> _BorrowingHistoryRepository;
-        private readonly IRepository<BookInBorrowingCart> _BookInBorrowingCartRepository;
-        private readonly IRepository<BookInBorrowingHistory> _BookInBorrowingHistoryRepository;
+        private readonly IRepository<BorrowingCart> _borrowingCartRepository;
+        private readonly IRepository<Book> _bookRepository;
+        private readonly IRepository<BorrowingHistory> _borrowingHistoryRepository;
+        private readonly IRepository<BookInBorrowingCart> _bookInBorrowingCartRepository;
+        private readonly IRepository<BookInBorrowingHistory> _bookInBorrowingHistoryRepository;
         private readonly IUserRepository _userRepository;
 
         public BorrowingCartService(IRepository<BorrowingCart> borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IUserRepository userRepository)
         {
-            _BorrowingCartRepository = borrowingCartRepository;
-            _BookRepository = bookRepository;
-            _BorrowingHistoryRepository = borrowingHistoryRepository;
-            _BookInBorrowingCartRepository = bookInBorrowingCartRepository;
-            _BookInBorrowingHistoryRepository = bookInBorrowingHistoryRepository;
+            _borrowingCartRepository = borrowingCartRepository;
+            _bookRepository = bookRepository;
+            _borrowingHistoryRepository = borrowingHistoryRepository;
+            _bookInBorrowingCartRepository = bookInBorrowingCartRepository;
+            _bookInBorrowingHistoryRepository = bookInBorrowingHistoryRepository;
             _userRepository = userRepository;
         }
 
@@ -44,71 +44,76 @@ namespace OnlineLibrary.Service.Implementation
                 BorrowingCart.Books = new List<BookInBorrowingCart>(); ;
 
             BorrowingCart.Books.Add(model);
-            _BorrowingCartRepository.Update(BorrowingCart);
+            _borrowingCartRepository.Update(BorrowingCart);
             return true;
         }
 
-        public bool borrow(string userId)
+       public bool borrow(string memberId)
         {
-            if(userId == null)
-                return false;
-
-            var loggedInUser = _userRepository.Get(userId);
-            /*
-            var userBorrowingCart = loggedInUser?.BorrowingCart;
-            // EmailMessage message = new EmailMessage();
-            message.Subject = "Successfull BorrowingHistory";
-            message.MailTo = loggedInUser.Email;
-            BorrowingHistory BorrowingHistory = new BorrowingHistory
+            if (memberId != null)
             {
-                Id = Guid.NewGuid(),
-                MemberId = userId,
-                User = loggedInUser
-            };
+                var loggedInUser = _userRepository.Get(memberId);
 
-            List<BookInBorrowingHistory> BooksInBorrowingHistory = new List<BookInBorrowingHistory>();
+                var userBorrowingHistory = loggedInUser.BorrowingCart;
+                //EmailMessage message = new EmailMessage(); todo: implement email service
+                //message.Subject = "Successfull order";
+                //message.MailTo = loggedInUser.Email;
 
-            var rez = userBorrowingCart?.Books.Select(
-                z => new BookInBorrowingHistory
+                BorrowingHistory borrowingHistory = new BorrowingHistory
                 {
                     Id = Guid.NewGuid(),
-                    BookId = z.Book.Id,
-                    Book = z.Book,
-                    BorrowingHistoryId = BorrowingHistory.Id,
-                    BorrowingHistory = BorrowingHistory,
-                    BorrowedAt = DateTime.Now
-                }).ToList();
+                    MemberId = memberId,
+                    Member = loggedInUser
+                };
+
+                _borrowingHistoryRepository.Insert(borrowingHistory);
+
+                List<BookInBorrowingHistory> bookInBorrowingHistory = new List<BookInBorrowingHistory>();
+
+                var lista = userBorrowingHistory.Books.Select(
+                    x => new BookInBorrowingHistory
+                    {
+                        Id = Guid.NewGuid(),
+                        BookId = x.Book.Id,
+                        Book = x.Book,
+                        BorrowingHistoryId = borrowingHistory.Id,
+                        BorrowingHistory = borrowingHistory,
+                        BorrowedAt = DateTime.Now,
+                        Returned = false
+                    }
+                    ).ToList();
 
 
-            StringBuilder sb = new StringBuilder();
+                //StringBuilder sb = new StringBuilder(); todo: implement email service
 
-            var totalPrice = 0.0;
+                //var totalPrice = 0.0;
 
-            sb.AppendLine("Your BorrowingHistory is completed. The BorrowingHistory conatins: ");
+                //sb.AppendLine("Your order is completed. The order conatins: ");
 
-            for (int i = 1; i <= rez.Count(); i++)
-            {
-                var currentItem = rez[i - 1];
-                totalPrice += currentItem.Quantity * currentItem.Book.Price;
-                sb.AppendLine(i.ToString() + ". " + currentItem.Book.BookName + " with quantity of: " + currentItem.Quantity + " and price of: $" + currentItem.Book.Price);
+                //for (int i = 1; i <= lista.Count(); i++)
+                //{
+                //    var currentItem = lista[i - 1];
+                //    totalPrice += currentItem.Quantity * currentItem.Product.Price;
+                //    sb.AppendLine(i.ToString() + ". " + currentItem.Product.ProductName + " with quantity of: " + currentItem.Quantity + " and price of: $" + currentItem.Product.Price);
+                //}
+
+                //sb.AppendLine("Total price for your order: " + totalPrice.ToString());
+                //message.Content = sb.ToString();
+
+                bookInBorrowingHistory.AddRange(lista);
+
+                foreach (var book in bookInBorrowingHistory)
+                {
+                    _bookInBorrowingHistoryRepository.Insert(book);
+                }
+
+                loggedInUser.BorrowingCart.Books.Clear();
+                _userRepository.Update(loggedInUser);
+                //this._emailService.SendEmailAsync(message); todo: implement email service
+
+                return true;
             }
-
-            sb.AppendLine("Total price for your BorrowingHistory: " + totalPrice.ToString());
-            message.Content = sb.ToString();
-
-            BooksInBorrowingHistory.AddRange(rez);
-
-            foreach (var Book in BooksInBorrowingHistory)
-            {
-                _BookInBorrowingHistoryRepository.Insert(Book);
-            }
-
-            loggedInUser.BorrowingCart.BookInBorrowingCarts.Clear();
-            _userRepository.Update(loggedInUser);
-            this._emailService.SendEmailAsync(message);
-
-            return true;*/
-            throw new NotImplementedException();
+            return false;
         }
 
         public bool deleteBookFromBorrowingCart(string userId, Guid BookId)
@@ -121,7 +126,7 @@ namespace OnlineLibrary.Service.Implementation
             var Book = userBorrowingCart?.Books?.Where(x => x.BookId == BookId).FirstOrDefault();
 
             userBorrowingCart?.Books?.Remove(Book);
-            _BorrowingCartRepository.Update(userBorrowingCart);
+            _borrowingCartRepository.Update(userBorrowingCart);
             return true;
         }
 
@@ -129,12 +134,12 @@ namespace OnlineLibrary.Service.Implementation
         {
             var loggedInUser = _userRepository.Get(userId);
             var userBorrowingCart = loggedInUser?.BorrowingCart;
-            var allBook = userBorrowingCart?.Books?.ToList();
+            var allBooks = userBorrowingCart?.Books?.ToList();
 
             BorrowingCartDTO dto = new BorrowingCartDTO
             {
-                BooksInCart = allBook,
-                NumBorrowedBooks = allBook.Count()
+                BooksInCart = allBooks,
+                NumBorrowedBooks = allBooks.Count()
             };
             return dto;
         }

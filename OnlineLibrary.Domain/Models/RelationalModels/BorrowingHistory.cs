@@ -11,7 +11,7 @@ namespace OnlineLibrary.Domain.Models.RelationalModels
     public class BorrowingHistory : BaseEntity
     {
         public string? MemberId{ get; set; }
-        public Member? User { get; set; }
+        public Member? Member { get; set; }
         public List<BookInBorrowingHistory>? Books { get; set; }
     }
 }
