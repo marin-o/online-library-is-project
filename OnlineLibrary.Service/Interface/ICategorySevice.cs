@@ -14,5 +14,6 @@ namespace OnlineLibrary.Service.Interface
         void CreateNewCategory(Category b);
         void UpdeteExistingCategory(Category b);
         void DeleteCategory(Guid id);
+        bool CategoryExists(Guid id);
     }
 }

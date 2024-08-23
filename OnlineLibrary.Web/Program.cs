@@ -27,6 +27,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 
 builder.Services.AddTransient<IAuthorService, AuthorService>();
+builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBorrowingCartService, BorrowingCartService>();
