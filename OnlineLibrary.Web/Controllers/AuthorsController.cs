@@ -7,34 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Repository;
+using OnlineLibrary.Service.Interface;
 
 namespace OnlineLibrary.Web.Controllers
 {
     public class AuthorsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAuthorService authorService;
 
-        public AuthorsController(ApplicationDbContext context)
+        public AuthorsController(IAuthorService authorService)
         {
-            _context = context;
+            this.authorService = authorService;
         }
 
         // GET: Authors
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Authors.ToListAsync());
+            return View(authorService.GetAllAuthors());
         }
 
         // GET: Authors/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public IActionResult Details(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var author = await _context.Authors
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var author = authorService.GetDetailsForAuthor(id);
+
             if (author == null)
             {
                 return NotFound();
@@ -54,27 +55,27 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Biography,Id")] Author author)
+        public IActionResult Create([Bind("Name,Biography,Id")] Author author)
         {
             if (ModelState.IsValid)
             {
                 author.Id = Guid.NewGuid();
-                _context.Add(author);
-                await _context.SaveChangesAsync();
+                authorService.CreateNewAuthor(author);
                 return RedirectToAction(nameof(Index));
             }
             return View(author);
         }
 
         // GET: Authors/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Edit(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var author = await _context.Authors.FindAsync(id);
+            var author = authorService.GetDetailsForAuthor(id);
+
             if (author == null)
             {
                 return NotFound();
@@ -87,7 +88,7 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Biography,Id")] Author author)
+        public IActionResult Edit(Guid id, [Bind("Name,Biography,Id")] Author author)
         {
             if (id != author.Id)
             {
@@ -98,8 +99,7 @@ namespace OnlineLibrary.Web.Controllers
             {
                 try
                 {
-                    _context.Update(author);
-                    await _context.SaveChangesAsync();
+                    authorService.UpdeteExistingAuthor(author);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,22 +111,24 @@ namespace OnlineLibrary.Web.Controllers
                     {
                         throw;
                     }
+                    
                 }
+                
                 return RedirectToAction(nameof(Index));
             }
             return View(author);
         }
 
         // GET: Authors/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        public IActionResult Delete(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var author = await _context.Authors
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var author = authorService.GetDetailsForAuthor(id);
+
             if (author == null)
             {
                 return NotFound();
@@ -138,21 +140,21 @@ namespace OnlineLibrary.Web.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(Guid id)
         {
-            var author = await _context.Authors.FindAsync(id);
+            var author = authorService.GetDetailsForAuthor(id);
             if (author != null)
             {
-                _context.Authors.Remove(author);
+                authorService.DeleteAuthor(author.Id);
             }
 
-            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         private bool AuthorExists(Guid id)
         {
-            return _context.Authors.Any(e => e.Id == id);
+            return authorService.AuthorExists(id);
         }
     }
 }

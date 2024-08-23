@@ -41,5 +41,10 @@ namespace OnlineLibrary.Service.Implementation
         {
             _AuthorRepository.Update(p);
         }
+
+        public bool AuthorExists(Guid id)
+        {
+            return _AuthorRepository.Get(id) != null;
+        }
     }
 }

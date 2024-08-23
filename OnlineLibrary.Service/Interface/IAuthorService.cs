@@ -14,5 +14,6 @@ namespace OnlineLibrary.Service.Interface
         void CreateNewAuthor(Author b);
         void UpdeteExistingAuthor(Author b);
         void DeleteAuthor(Guid id);
+        bool AuthorExists(Guid id);
     }
 }
