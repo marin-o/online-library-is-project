@@ -13,7 +13,7 @@ namespace OnlineLibrary.Domain.Identity
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Address { get; set; }
-        public virtual BorrowingCart BorrowingCart { get; set; }
+        public virtual BorrowingCart? BorrowingCart { get; set; }
         public virtual ICollection<BorrowingHistory>? BorrowingHistories { get; set; }
     }
 }
