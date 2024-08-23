@@ -142,12 +142,10 @@ namespace OnlineLibrary.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            var author = authorService.GetDetailsForAuthor(id);
-            if (author != null)
+            if(AuthorExists(id))
             {
-                authorService.DeleteAuthor(author.Id);
+                authorService.DeleteAuthor(id);
             }
-
 
             return RedirectToAction(nameof(Index));
         }

@@ -25,6 +25,7 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddTransient<IAuthorService, AuthorService>();
+builder.Services.AddTransient<ICategorySevice, CategoryService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

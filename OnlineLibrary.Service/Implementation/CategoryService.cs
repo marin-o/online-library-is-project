@@ -42,5 +42,10 @@ namespace OnlineLibrary.Service.Implementation
         {
             _CategoryRepository.Update(p);
         }
+
+        public bool CategoryExists(Guid id)
+        {
+            return _CategoryRepository.Get(id) != null;
+        }
     }
 }

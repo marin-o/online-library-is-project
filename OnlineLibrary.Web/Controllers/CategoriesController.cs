@@ -7,34 +7,36 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Repository;
+using OnlineLibrary.Service.Interface;
 
 namespace OnlineLibrary.Web.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICategorySevice categorySevice;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ICategorySevice categorySevice)
         {
-            _context = context;
+            this.categorySevice = categorySevice;
         }
+        
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(categorySevice.GetAllCategories());
         }
 
         // GET: Categories/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public IActionResult Details(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = categorySevice.GetDetailsForCategory(id);
+
             if (category == null)
             {
                 return NotFound();
@@ -54,27 +56,28 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Id")] Category category)
+        public IActionResult Create([Bind("Name,Id")] Category category)
         {
             if (ModelState.IsValid)
             {
                 category.Id = Guid.NewGuid();
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                
+                categorySevice.CreateNewCategory(category);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
 
         // GET: Categories/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Edit(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
+            var category = categorySevice.GetDetailsForCategory(id);
             if (category == null)
             {
                 return NotFound();
@@ -87,7 +90,7 @@ namespace OnlineLibrary.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Id")] Category category)
+        public IActionResult Edit(Guid id, [Bind("Name,Id")] Category category)
         {
             if (id != category.Id)
             {
@@ -98,8 +101,7 @@ namespace OnlineLibrary.Web.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    categorySevice.UpdeteExistingCategory(category);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -118,15 +120,15 @@ namespace OnlineLibrary.Web.Controllers
         }
 
         // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        public IActionResult Delete(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = categorySevice.GetDetailsForCategory(id);
+
             if (category == null)
             {
                 return NotFound();
@@ -138,21 +140,19 @@ namespace OnlineLibrary.Web.Controllers
         // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            if (CategoryExists(id))
             {
-                _context.Categories.Remove(category);
+                categorySevice.DeleteCategory(id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CategoryExists(Guid id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return categorySevice.CategoryExists(id);
         }
     }
 }
