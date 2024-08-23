@@ -1,5 +1,6 @@
 ﻿using EShop.Repository.Interface;
 using OnlineLibrary.Domain.Models.BaseModels;
+using OnlineLibrary.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace OnlineLibrary.Service.Implementation
 {
-    public class NotificationService
-    {
+    public class NotificationService : INotificationService
+    { 
         private readonly IRepository<Notification> _NotificationRepository;
 
         public NotificationService(IRepository<Notification> NotificationRepository)

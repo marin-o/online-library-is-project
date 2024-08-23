@@ -1,5 +1,6 @@
 ﻿using EShop.Repository.Interface;
 using OnlineLibrary.Domain.Models.BaseModels;
+using OnlineLibrary.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OnlineLibrary.Service.Implementation
 {
-    public class CategoryService
+    public class CategoryService : ICategorySevice
     {
         private readonly IRepository<Category> _CategoryRepository;
 

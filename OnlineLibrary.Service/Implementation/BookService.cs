@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OnlineLibrary.Service.Implementation
 {
-    public class BookService
+    public class BookService : IBookService
     {
         private readonly IRepository<Book> _BookRepository;
 
