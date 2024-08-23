@@ -28,7 +28,7 @@ namespace OnlineLibrary.Service.Implementation
             _CategoryRepository.Delete(Category);
         }
 
-        public List<Category> GetAllCategorys()
+        public List<Category> GetAllCategories()
         {
             return _CategoryRepository.GetAll().ToList();
         }
