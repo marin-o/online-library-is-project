@@ -10,12 +10,12 @@ namespace OnlineLibrary.Domain.Models.BaseModels
     {
 
         public Guid BookId { get; set; }
-        public Book Book { get; set; }
+        public Book? Book { get; set; }
         public DateTime Date { get; set; }
 
         public string GetMessage()
         {
-            return $"The book {Book.Title} is the most read book this week.";
+            return $"The book {Book?.Title} is the most read book this week.";
         }
     }
 }
