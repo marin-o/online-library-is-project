@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Identity;
 using OnlineLibrary.Repository;
 using OnlineLibrary.Repository.Implementation;
-using OnlineLibrary.Service.Implementation;
 using OnlineLibrary.Service.Interface;
+using OnlineLibrary.Service.Implementation;
 using Stripe.Climate;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +23,8 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddTransient<IAuthorService, AuthorService>();
 
+builder.Services.AddTransient<IAuthorService, AuthorService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
