@@ -10,8 +10,8 @@ namespace OnlineLibrary.Domain.Models.RelationalModels
     public class BookInBorrowingCart : BaseEntity
     {
         public Guid BookId { get; set; }
-        public Book Book { get; set; }
+        public Book? Book { get; set; }
         public Guid BorrowingCartId { get; set; }
-        public BorrowingCart BorrowingCart { get; set; }
+        public BorrowingCart? BorrowingCart { get; set; }
     }
 }
