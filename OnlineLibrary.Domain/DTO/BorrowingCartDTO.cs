@@ -9,6 +9,7 @@ namespace OnlineLibrary.Domain.DTO
 {
     public class BorrowingCartDTO
     {
-        List<BookInBorrowingCart>? BooksInCart { get; set; }
+        public List<BookInBorrowingCart>? BooksInCart { get; set; }
+        public int NumBorrowedBooks { get; set; }
     }
 }
