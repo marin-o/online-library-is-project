@@ -15,22 +15,22 @@ namespace OnlineLibrary.Web.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly IBookService _BookService;
-        private readonly IBorrowingCartService _BorrowingCartService;
-        private readonly IAuthorService _AuthorService;
-        private readonly ICategorySevice _CategoryService;
+        private readonly IBookService bookService;
+        private readonly IBorrowingCartService borrowingCartService;
+        private readonly IAuthorService authorService;
+        private readonly ICategorySevice categoryService;
 
         public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService, IAuthorService authorService, ICategorySevice categoryService)
         {
-            _BookService = bookService;
-            _BorrowingCartService = borrowingCartService;
-            _AuthorService = authorService;
-            _CategoryService = categoryService;
+            this.bookService = bookService;
+            this.borrowingCartService = borrowingCartService;
+            this.authorService = authorService;
+            this.categoryService = categoryService;
         }
 
         public IActionResult Index()
         {
-            return View(_BookService.GetAllBooks());
+            return View(bookService.GetAllBooks());
         }
 
         // GET: Books/Details/5
@@ -41,7 +41,7 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = _BookService.GetDetailsForBook(id);
+            var Book = bookService.GetDetailsForBook(id);
             if (Book == null)
             {
                 return NotFound();
@@ -53,8 +53,8 @@ namespace OnlineLibrary.Web.Controllers
         // GET: Books/Create
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(_AuthorService.GetAllAuthors(), "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(_CategoryService.GetAllCategories(), "Id", "Name");
+            ViewData["AuthorId"] = new SelectList(authorService.GetAllAuthors(), "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(categoryService.GetAllCategories(), "Id", "Name");
             return View();
         }
 
@@ -68,9 +68,9 @@ namespace OnlineLibrary.Web.Controllers
             if (ModelState.IsValid)
             {
                 Book.Id = Guid.NewGuid();
-                Book.Author = _AuthorService.GetDetailsForAuthor(Book.AuthorId);
-                Book.Category = _CategoryService.GetDetailsForCategory(Book.CategoryId);
-                _BookService.CreateNewBook(Book);
+                Book.Author = authorService.GetDetailsForAuthor(Book.AuthorId);
+                Book.Category = categoryService.GetDetailsForCategory(Book.CategoryId);
+                bookService.CreateNewBook(Book);
                 return RedirectToAction(nameof(Index));
             }
             return View(Book);
@@ -83,7 +83,7 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = _BookService.GetDetailsForBook(id);
+            var Book = bookService.GetDetailsForBook(id);
 
             BookInBorrowingCart ps = new BookInBorrowingCart();
 
@@ -100,11 +100,11 @@ namespace OnlineLibrary.Web.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            _BorrowingCartService.AddToBorrowingConfirmed(model, userId);
+            borrowingCartService.AddToBorrowingConfirmed(model, userId);
 
 
 
-            return View("Index", _BookService.GetAllBooks());
+            return View("Index", bookService.GetAllBooks());
         }
 
 
@@ -116,14 +116,14 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = _BookService.GetDetailsForBook(id);
+            var Book = bookService.GetDetailsForBook(id);
             if (Book == null)
             {
                 return NotFound();
             }
 
-            ViewData["AuthorId"] = new SelectList(_AuthorService.GetAllAuthors(), "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(_CategoryService.GetAllCategories(), "Id", "Name");
+            ViewData["AuthorId"] = new SelectList(authorService.GetAllAuthors(), "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(categoryService.GetAllCategories(), "Id", "Name");
             return View(Book);
         }
 
@@ -141,11 +141,11 @@ namespace OnlineLibrary.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                Book.Author = _AuthorService.GetDetailsForAuthor(Book.AuthorId);
-                Book.Category = _CategoryService.GetDetailsForCategory(Book.CategoryId);
+                Book.Author = authorService.GetDetailsForAuthor(Book.AuthorId);
+                Book.Category = categoryService.GetDetailsForCategory(Book.CategoryId);
                 try
                 {
-                    _BookService.UpdeteExistingBook(Book);
+                    bookService.UpdeteExistingBook(Book);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -164,7 +164,7 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = _BookService.GetDetailsForBook(id);
+            var Book = bookService.GetDetailsForBook(id);
             if (Book == null)
             {
                 return NotFound();
@@ -178,7 +178,7 @@ namespace OnlineLibrary.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _BookService.DeleteBook(id);
+            bookService.DeleteBook(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -15,14 +15,14 @@ namespace OnlineLibrary.Service.Implementation
 {
     public class BorrowingCartService : IBorrowingCartService
     {
-        private readonly IRepository<BorrowingCart> _borrowingCartRepository;
+        private readonly IBorrowingCartRepository _borrowingCartRepository;
         private readonly IRepository<Book> _bookRepository;
         private readonly IRepository<BorrowingHistory> _borrowingHistoryRepository;
         private readonly IRepository<BookInBorrowingCart> _bookInBorrowingCartRepository;
         private readonly IRepository<BookInBorrowingHistory> _bookInBorrowingHistoryRepository;
         private readonly IUserRepository _userRepository;
 
-        public BorrowingCartService(IRepository<BorrowingCart> borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IUserRepository userRepository)
+        public BorrowingCartService(IBorrowingCartRepository borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IUserRepository userRepository)
         {
             _borrowingCartRepository = borrowingCartRepository;
             _bookRepository = bookRepository;

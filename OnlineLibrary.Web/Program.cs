@@ -2,11 +2,11 @@ using EShop.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Identity;
 using OnlineLibrary.Repository;
+using OnlineLibrary.Repository.Interface;
 using OnlineLibrary.Repository.Implementation;
 using OnlineLibrary.Service.Interface;
 using OnlineLibrary.Service.Implementation;
 using Stripe.Climate;
-using OnlineLibrary.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,12 +25,15 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IBorrowingCartRepository), typeof(BorrowingCartRepository));
+builder.Services.AddScoped(typeof(IBorrowingHistoryRepository), typeof(BorrowingHistoryRepository));
 
 builder.Services.AddTransient<IAuthorService, AuthorService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBorrowingCartService, BorrowingCartService>();
+builder.Services.AddTransient<IBorrowingHistoryService, BorrowingHistoryService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
