@@ -24,10 +24,11 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IMemberRepository), typeof(MemberRepository));
 builder.Services.AddScoped(typeof(IBorrowingCartRepository), typeof(BorrowingCartRepository));
 builder.Services.AddScoped(typeof(IBorrowingHistoryRepository), typeof(BorrowingHistoryRepository));
 
+builder.Services.AddTransient<IMemberService, MemberService>();
 builder.Services.AddTransient<IAuthorService, AuthorService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBookService, BookService>();

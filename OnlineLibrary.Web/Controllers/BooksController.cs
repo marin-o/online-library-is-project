@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;
-using OnlineLibrary.Repository;
 using OnlineLibrary.Service.Interface;
 
 namespace OnlineLibrary.Web.Controllers
@@ -33,7 +30,6 @@ namespace OnlineLibrary.Web.Controllers
             return View(bookService.GetAllBooks());
         }
 
-        // GET: Books/Details/5
         public IActionResult Details(Guid? id)
         {
             if (id == null)
@@ -41,16 +37,15 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = bookService.GetDetailsForBook(id);
-            if (Book == null)
+            var book = bookService.GetDetailsForBook(id);
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(Book);
+            return View(book);
         }
 
-        // GET: Books/Create
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(authorService.GetAllAuthors(), "Id", "Name");
@@ -58,22 +53,19 @@ namespace OnlineLibrary.Web.Controllers
             return View();
         }
 
-        // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id, Title, AuthorId, ISBN, Description, ImageUrl, Year, Pages, Quantity, Available, CategoryId")] Book Book)
+        public IActionResult Create([Bind("Id,Title,AuthorId,ISBN,Description,ImageUrl,Year,Pages,Quantity,Available,CategoryId")] Book book)
         {
             if (ModelState.IsValid)
             {
-                Book.Id = Guid.NewGuid();
-                Book.Author = authorService.GetDetailsForAuthor(Book.AuthorId);
-                Book.Category = categoryService.GetDetailsForCategory(Book.CategoryId);
-                bookService.CreateNewBook(Book);
+                book.Id = Guid.NewGuid();
+                book.Author = authorService.GetDetailsForAuthor(book.AuthorId);
+                book.Category = categoryService.GetDetailsForCategory(book.CategoryId);
+                bookService.CreateNewBook(book);
                 return RedirectToAction(nameof(Index));
             }
-            return View(Book);
+            return View(book);
         }
 
         public IActionResult AddToCart(Guid? id)
@@ -83,16 +75,15 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = bookService.GetDetailsForBook(id);
+            var book = bookService.GetDetailsForBook(id);
 
-            BookInBorrowingCart ps = new BookInBorrowingCart();
-
-            if (Book != null)
+            var bookInBorrowingCart = new BookInBorrowingCart
             {
-                ps.BookId = Book.Id;
-            }
+                BookId = book.Id,
+                Book = book
+            };
 
-            return View(ps);
+            return View(bookInBorrowingCart);
         }
 
         [HttpPost]
@@ -100,15 +91,11 @@ namespace OnlineLibrary.Web.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            borrowingCartService.AddToBorrowingConfirmed(model, userId);
+            borrowingCartService.AddBookToBorrowingCart(model, userId);
 
-
-
-            return View("Index", bookService.GetAllBooks());
+            return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: Books/Edit/5
         public IActionResult Edit(Guid? id)
         {
             if (id == null)
@@ -116,36 +103,33 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = bookService.GetDetailsForBook(id);
-            if (Book == null)
+            var book = bookService.GetDetailsForBook(id);
+            if (book == null)
             {
                 return NotFound();
             }
 
             ViewData["AuthorId"] = new SelectList(authorService.GetAllAuthors(), "Id", "Name");
             ViewData["CategoryId"] = new SelectList(categoryService.GetAllCategories(), "Id", "Name");
-            return View(Book);
+            return View(book);
         }
 
-        // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, [Bind("Id, Title, AuthorId, ISBN, Description, ImageUrl, Year, Pages, Quantity, Available, CategoryId")] Book Book)
+        public IActionResult Edit(Guid id, [Bind("Id,Title,AuthorId,ISBN,Description,ImageUrl,Year,Pages,Quantity,Available,CategoryId")] Book book)
         {
-            if (id != Book.Id)
+            if (id != book.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                Book.Author = authorService.GetDetailsForAuthor(Book.AuthorId);
-                Book.Category = categoryService.GetDetailsForCategory(Book.CategoryId);
+                book.Author = authorService.GetDetailsForAuthor(book.AuthorId);
+                book.Category = categoryService.GetDetailsForCategory(book.CategoryId);
                 try
                 {
-                    bookService.UpdeteExistingBook(Book);
+                    bookService.UpdeteExistingBook(book);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -153,10 +137,9 @@ namespace OnlineLibrary.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(Book);
+            return View(book);
         }
 
-        // GET: Books/Delete/5
         public IActionResult Delete(Guid? id)
         {
             if (id == null)
@@ -164,16 +147,15 @@ namespace OnlineLibrary.Web.Controllers
                 return NotFound();
             }
 
-            var Book = bookService.GetDetailsForBook(id);
-            if (Book == null)
+            var book = bookService.GetDetailsForBook(id);
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(Book);
+            return View(book);
         }
 
-        // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)

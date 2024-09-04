@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OnlineLibrary.Repository.Interface
 {
-    public interface IUserRepository
+    public interface IMemberRepository
     {
         IEnumerable<Member> GetAll();
         Member Get(string? id);

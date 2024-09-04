@@ -1,36 +1,36 @@
-﻿@model IEnumerable<OnlineLibrary.Domain.Models.RelationalModels.BorrowingCart>
+﻿@model OnlineLibrary.Domain.DTO.BorrowingCartDTO
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "My Borrowing Cart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>My Borrowing Cart</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Member)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Member.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (Model.BooksInCart != null && Model.BooksInCart.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bookInCart in Model.BooksInCart)
+            {
+                <tr>
+                    <td>@bookInCart.Book.Title</td>
+                    <td>@bookInCart.Book.Author.Name</td>
+                    <td>@bookInCart.Book.ISBN</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
-    </tbody>
-</table>
+else
+{
+    <p>Your borrowing cart is empty.</p>
+}

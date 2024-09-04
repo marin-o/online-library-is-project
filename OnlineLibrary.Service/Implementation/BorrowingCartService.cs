@@ -20,9 +20,9 @@ namespace OnlineLibrary.Service.Implementation
         private readonly IRepository<BorrowingHistory> _borrowingHistoryRepository;
         private readonly IRepository<BookInBorrowingCart> _bookInBorrowingCartRepository;
         private readonly IRepository<BookInBorrowingHistory> _bookInBorrowingHistoryRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IMemberRepository _userRepository;
 
-        public BorrowingCartService(IBorrowingCartRepository borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IUserRepository userRepository)
+        public BorrowingCartService(IBorrowingCartRepository borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IMemberRepository userRepository)
         {
             _borrowingCartRepository = borrowingCartRepository;
             _bookRepository = bookRepository;
@@ -32,19 +32,30 @@ namespace OnlineLibrary.Service.Implementation
             _userRepository = userRepository;
         }
 
-        public bool AddToBorrowingConfirmed(BookInBorrowingCart model, string userId)
+        public bool AddBookToBorrowingCart(BookInBorrowingCart model, string userId)
         {
             if(userId == null)
                 return false;
 
             var loggedInUser = _userRepository.Get(userId);
-            var BorrowingCart = loggedInUser?.BorrowingCart;
+            var borrowingCart = loggedInUser?.BorrowingCart;
 
-            if (BorrowingCart.Books == null)
-                BorrowingCart.Books = new List<BookInBorrowingCart>(); ;
+            if (borrowingCart == null)
+            {
+                borrowingCart = new BorrowingCart
+                {
+                    Id = Guid.NewGuid(),
+                    MemberId = userId,
+                    Member = loggedInUser
+                };
+                loggedInUser.BorrowingCart = borrowingCart;
+            }
+            if (borrowingCart.Books == null)
+                borrowingCart.Books = new List<BookInBorrowingCart>();
 
-            BorrowingCart.Books.Add(model);
-            _borrowingCartRepository.Update(BorrowingCart);
+            model.BorrowingCart = borrowingCart;
+            borrowingCart.Books.Add(model);
+            _borrowingCartRepository.Update(borrowingCart);
             return true;
         }
 
@@ -134,8 +145,17 @@ namespace OnlineLibrary.Service.Implementation
         {
             var loggedInUser = _userRepository.Get(userId);
             var userBorrowingCart = loggedInUser?.BorrowingCart;
-            var allBooks = userBorrowingCart?.Books?.ToList();
 
+            if(userBorrowingCart == null)
+            {
+                return new BorrowingCartDTO
+                {
+                    BooksInCart = new List<BookInBorrowingCart>(),
+                    NumBorrowedBooks = 0
+                };
+            }
+
+            var allBooks = userBorrowingCart?.Books?.ToList();
             BorrowingCartDTO dto = new BorrowingCartDTO
             {
                 BooksInCart = allBooks,

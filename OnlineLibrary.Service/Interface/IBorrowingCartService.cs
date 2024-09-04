@@ -13,6 +13,6 @@ namespace OnlineLibrary.Service.Interface
         BorrowingCartDTO getBorrowingCartInfo(string userId);
         bool deleteBookFromBorrowingCart(string userId, Guid productId);
         bool borrow(string userId);
-        bool AddToBorrowingConfirmed(BookInBorrowingCart model, string userId);
+        bool AddBookToBorrowingCart(BookInBorrowingCart model, string userId);
     }
 }

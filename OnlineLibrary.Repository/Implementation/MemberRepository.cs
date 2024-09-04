@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace OnlineLibrary.Repository.Implementation
 {
-    public class UserRepository : IUserRepository
+    public class MemberRepository : IMemberRepository
     {
         private readonly ApplicationDbContext context;
         private DbSet<Member> entities;
         string errorMessage = string.Empty;
 
-        public UserRepository(ApplicationDbContext context)
+        public MemberRepository(ApplicationDbContext context)
         {
             this.context = context;
             entities = context.Set<Member>();
