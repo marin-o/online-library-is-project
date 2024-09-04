@@ -22,9 +22,9 @@
             @foreach (var bookInCart in Model.BooksInCart)
             {
                 <tr>
-                    <td>@bookInCart.Book.Title</td>
-                    <td>@bookInCart.Book.Author.Name</td>
-                    <td>@bookInCart.Book.ISBN</td>
+                    <td>@bookInCart?.Book?.Title</td>
+                    <td>@bookInCart?.Book?.Author?.Name</td>
+                    <td>@bookInCart?.Book?.ISBN</td>
                 </tr>
             }
         </tbody>

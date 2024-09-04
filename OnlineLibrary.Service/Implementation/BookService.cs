@@ -4,6 +4,7 @@ using OnlineLibrary.Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,7 +36,8 @@ namespace OnlineLibrary.Service.Implementation
 
         public Book GetDetailsForBook(Guid? id)
         {
-            return _BookRepository.Get(id);
+            var book = _BookRepository.Get(id);
+            return book;
         }
 
         public void UpdeteExistingBook(Book p)

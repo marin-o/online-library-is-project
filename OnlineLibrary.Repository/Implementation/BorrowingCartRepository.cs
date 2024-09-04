@@ -40,7 +40,9 @@ namespace OnlineLibrary.Repository.Implementation
             return entities
                 .Include(z => z.Books)
                 .ThenInclude(z => z.Book)
+                .ThenInclude(z => z.Author)
                 .Include(z => z.Member)
+
                 .SingleOrDefault(s => s.Id == id);
         }
 
@@ -49,6 +51,7 @@ namespace OnlineLibrary.Repository.Implementation
             return entities
                 .Include(z => z.Books)
                 .ThenInclude(z => z.Book)
+                .ThenInclude(z => z.Author)
                 .Include(z => z.Member)
                 .AsEnumerable();
         }

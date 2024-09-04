@@ -2,6 +2,7 @@
 using OnlineLibrary.Domain.DTO;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;
+using OnlineLibrary.Repository.Implementation;
 using OnlineLibrary.Repository.Interface;
 using OnlineLibrary.Service.Interface;
 using System;
@@ -144,7 +145,7 @@ namespace OnlineLibrary.Service.Implementation
         public BorrowingCartDTO getBorrowingCartInfo(string userId)
         {
             var loggedInUser = _userRepository.Get(userId);
-            var userBorrowingCart = loggedInUser?.BorrowingCart;
+            var userBorrowingCart = _borrowingCartRepository.Get(loggedInUser.BorrowingCart.Id);
 
             if(userBorrowingCart == null)
             {

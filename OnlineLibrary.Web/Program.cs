@@ -7,6 +7,7 @@ using OnlineLibrary.Repository.Implementation;
 using OnlineLibrary.Service.Interface;
 using OnlineLibrary.Service.Implementation;
 using Stripe.Climate;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
