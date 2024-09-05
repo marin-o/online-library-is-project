@@ -60,17 +60,34 @@ namespace OnlineLibrary.Service.Implementation
             return true;
         }
 
-       public bool borrow(string memberId)
+        public (bool success, List<Book>? unavailableBooks) borrow(string memberId)
         {
             if (memberId != null)
             {
                 var loggedInUser = _userRepository.Get(memberId);
 
                 var userBorrowingHistory = loggedInUser.BorrowingCart;
-                //EmailMessage message = new EmailMessage(); todo: implement email service
-                //message.Subject = "Successfull order";
-                //message.MailTo = loggedInUser.Email;
 
+                // List to store books that are unavailable
+                List<Book> unavailableBooks = new List<Book>();
+
+                // Check if each book has enough quantity
+                foreach (var item in userBorrowingHistory.Books)
+                {
+                    var book = _bookRepository.Get(item.Book.Id); // Retrieve the book from the database
+                    if (book.Quantity <= 0)
+                    {
+                        unavailableBooks.Add(book); // Add to the list if it's unavailable
+                    }
+                }
+
+                // If any book is unavailable, return and show them to the user
+                if (unavailableBooks.Any())
+                {
+                    return (false, unavailableBooks); // Return false with the list of unavailable books
+                }
+
+                // Proceed with the borrowing process
                 BorrowingHistory borrowingHistory = new BorrowingHistory
                 {
                     Id = Guid.NewGuid(),
@@ -93,24 +110,15 @@ namespace OnlineLibrary.Service.Implementation
                         BorrowedAt = DateTime.Now,
                         Returned = false
                     }
-                    ).ToList();
+                ).ToList();
 
-
-                //StringBuilder sb = new StringBuilder(); todo: implement email service
-
-                //var totalPrice = 0.0;
-
-                //sb.AppendLine("Your order is completed. The order conatins: ");
-
-                //for (int i = 1; i <= lista.Count(); i++)
-                //{
-                //    var currentItem = lista[i - 1];
-                //    totalPrice += currentItem.Quantity * currentItem.Product.Price;
-                //    sb.AppendLine(i.ToString() + ". " + currentItem.Product.ProductName + " with quantity of: " + currentItem.Quantity + " and price of: $" + currentItem.Product.Price);
-                //}
-
-                //sb.AppendLine("Total price for your order: " + totalPrice.ToString());
-                //message.Content = sb.ToString();
+                // Now decrease the quantity of each book
+                foreach (var bookInList in lista)
+                {
+                    var currentBook = _bookRepository.Get(bookInList.BookId); // Retrieve the book from the database
+                    currentBook.Quantity -= 1; // Reduce the quantity by 1
+                    _bookRepository.Update(currentBook); // Save the updated quantity to the database
+                }
 
                 bookInBorrowingHistory.AddRange(lista);
 
@@ -121,12 +129,12 @@ namespace OnlineLibrary.Service.Implementation
 
                 loggedInUser.BorrowingCart.Books.Clear();
                 _userRepository.Update(loggedInUser);
-                //this._emailService.SendEmailAsync(message); todo: implement email service
 
-                return true;
+                return (true, null); // Borrowing successful, no unavailable books
             }
-            return false;
+            return (false, null); // Failed due to null memberId
         }
+
 
         public bool deleteBookFromBorrowingCart(string userId, Guid BookId)
         {

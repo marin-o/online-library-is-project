@@ -1,4 +1,5 @@
 ﻿using OnlineLibrary.Domain.DTO;
+using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace OnlineLibrary.Service.Interface
     {
         BorrowingCartDTO getBorrowingCartInfo(string userId);
         bool deleteBookFromBorrowingCart(string userId, Guid productId);
-        bool borrow(string userId);
+        (bool success, List<Book>? unavailableBooks) borrow(string userId);
         bool AddBookToBorrowingCart(BookInBorrowingCart model, string userId);
         void RemoveFromCart(string userId, Guid value);
     }

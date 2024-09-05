@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineLibrary.Domain.DTO;
+using OnlineLibrary.Domain.Identity;
 using OnlineLibrary.Domain.Models.RelationalModels;
 using OnlineLibrary.Repository;
 using OnlineLibrary.Service.Interface;
@@ -28,7 +29,7 @@ namespace OnlineLibrary.Web.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
-                return Challenge(); // Redirect to login if user is not authenticated
+                return Challenge(); 
             }
 
             var borrowingCart = borrowingCartService.getBorrowingCartInfo(userId);
@@ -45,11 +46,38 @@ namespace OnlineLibrary.Web.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
-                return Challenge(); // Redirect to login if user is not authenticated
+                return Challenge(); 
             }
 
             borrowingCartService.RemoveFromCart(userId, id.Value);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Borrow()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Challenge(); 
+            }
+
+            var result = borrowingCartService.borrow(userId);
+
+            if (!result.success)
+            {
+                // Pass the unavailable books to the view to notify the user
+                return View("UnavailableBooks", result.unavailableBooks);
+            }
+            else
+            {
+                // Continue with the borrowing process or redirect to a success page
+                return RedirectToAction("BorrowSuccess");
+            }
+        }
+
+        public IActionResult BorrowSuccess()
+        {
+            return View();
         }
     }
 }

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<OnlineLibrary.Domain.Models.BaseModels.Book>
+
+@{
+    ViewData["Title"] = "UnavailableBooks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>The following books you have attempted to borrow are not available currently.</h1>
+<h2>Please remove them from your cart if you wish to proceed.</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ISBN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Available)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ISBN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Available)
+            </td>
+            
+        </tr>
+}
+    </tbody>
+</table>
