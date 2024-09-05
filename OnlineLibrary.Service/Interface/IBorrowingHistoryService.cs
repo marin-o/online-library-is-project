@@ -15,5 +15,8 @@ namespace OnlineLibrary.Service.Interface
         void Update(BorrowingHistory entity);
         void Delete(BorrowingHistory entity);
         bool Exists(Guid id);
+        List<BorrowingHistory> GetBorrowingHistoriesForUser(string userId);
+        bool ReturnBooks(Guid borrowingHistoryId, string userId);
+        public bool ReturnBook(Guid borrowingHistoryId, Guid bookId, string userId);
     }
 }

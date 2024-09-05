@@ -1,0 +1,68 @@
+﻿@model OnlineLibrary.Domain.Models.RelationalModels.BorrowingHistory
+
+@{
+    ViewData["Title"] = "ReturnBooks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>ReturnBooks</h1>
+
+<div>
+    <h4>BorrowingHistory</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Member)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Member.Id)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Book
+                </th>
+                <th>
+                    Borrow Date
+                </th>
+                <th>
+                    Return
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Books)
+            {
+                <tr>
+                    <td style="width:25%">
+                        @Html.DisplayFor(modelItem => item.Book.Title)
+                    </td>
+                    <td style="width:25%">
+                        @Html.DisplayFor(modelItem => item.BorrowedAt)
+                    </td>
+                    <td>
+                    @if(!item.Returned){
+                        <form asp-action="ReturnBook" method="post">
+                            <input type="hidden" name="borrowingHistoryId" value="@Model.Id" />
+                            <input type="hidden" name="bookId" value="@item.BookId" />
+                            <input type="submit" value="Return" />
+                        </form>
+                    }
+                    else {
+                        <span>Already returned on @item.ReturnedAt</span>
+                    }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
