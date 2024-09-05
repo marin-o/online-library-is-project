@@ -25,6 +25,7 @@
                     <td>@bookInCart?.Book?.Title</td>
                     <td>@bookInCart?.Book?.Author?.Name</td>
                     <td>@bookInCart?.Book?.ISBN</td>
+                    <td><a asp-action="RemoveFromCart" asp-route-id="@bookInCart?.Id">Remove from cart</a></td>
                 </tr>
             }
         </tbody>

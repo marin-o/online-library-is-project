@@ -164,5 +164,18 @@ namespace OnlineLibrary.Service.Implementation
             };
             return dto;
         }
+
+        public void RemoveFromCart(string userId, Guid value)
+        {
+            if (userId == null)
+                return;
+
+            var loggedInUser = _userRepository.Get(userId);
+            var userBorrowingCart = loggedInUser?.BorrowingCart;
+            var Book = userBorrowingCart?.Books?.Where(x => x.Id == value).FirstOrDefault();
+
+            userBorrowingCart?.Books?.Remove(Book);
+            _borrowingCartRepository.Update(userBorrowingCart);
+        }
     }
 }

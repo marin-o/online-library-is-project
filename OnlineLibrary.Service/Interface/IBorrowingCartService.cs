@@ -14,5 +14,6 @@ namespace OnlineLibrary.Service.Interface
         bool deleteBookFromBorrowingCart(string userId, Guid productId);
         bool borrow(string userId);
         bool AddBookToBorrowingCart(BookInBorrowingCart model, string userId);
+        void RemoveFromCart(string userId, Guid value);
     }
 }

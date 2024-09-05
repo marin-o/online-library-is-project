@@ -34,5 +34,22 @@ namespace OnlineLibrary.Web.Controllers
             var borrowingCart = borrowingCartService.getBorrowingCartInfo(userId);
             return View(borrowingCart);
         }
+
+        public IActionResult RemoveFromCart(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Challenge(); // Redirect to login if user is not authenticated
+            }
+
+            borrowingCartService.RemoveFromCart(userId, id.Value);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
