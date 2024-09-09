@@ -1,0 +1,40 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model AdminApplication.Models.BorrowingHistory
+
+<div class="container">
+    <div>
+        <p>History for @Model.Member?.UserName</p>
+    </div>
+
+    @for(int i=0;i<Model.Books?.Count(); i++)
+    {
+        var item = Model.Books?.ElementAt(i).Book;
+        if(i % 3 == 0)
+        {
+            @:<div class="row">
+        }
+        <div class="col-3 m-4">
+
+            <div class="card" style="width: 18rem; height: 35rem">
+                <img class="card-img-top" src="@item?.ImageUrl" alt="Book image cap">
+                <div class="card-body">
+                    <h5 class="card-title">@item?.Title</h5>
+                    <p class="card-text">@item?.Description</p>
+                    <h6>@item?.Author</h6>
+                    <h6>@item?.ISBN</h6>
+                </div>
+
+            </div>
+        </div>
+
+        if(i % 3 == 2)
+        {
+            @:</div>
+        }
+    }
+</div>
