@@ -8,6 +8,7 @@ using OnlineLibrary.Service.Interface;
 using OnlineLibrary.Service.Implementation;
 using Stripe.Climate;
 using Microsoft.AspNetCore.Identity;
+using OnlineLibrary.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,11 +25,29 @@ builder.Services.AddDefaultIdentity<Member>(options => options.SignIn.RequireCon
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
+var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+if (!string.IsNullOrEmpty(smtpPassword))
+{
+    emailSettings.SmtpPassword = smtpPassword;
+}
+builder.Services.Configure<EmailSettings>(options =>
+{
+    options.SmtpServer = emailSettings.SmtpServer;
+    options.SmtpUserName = emailSettings.SmtpUserName;
+    options.SmtpPassword = emailSettings.SmtpPassword;
+    options.SmtpServerPort = emailSettings.SmtpServerPort;
+    options.EnableSsl = emailSettings.EnableSsl;
+    options.EmailDisplayName = emailSettings.EmailDisplayName;
+    options.SendersName = emailSettings.SendersName;
+});
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IMemberRepository), typeof(MemberRepository));
 builder.Services.AddScoped(typeof(IBorrowingCartRepository), typeof(BorrowingCartRepository));
 builder.Services.AddScoped(typeof(IBorrowingHistoryRepository), typeof(BorrowingHistoryRepository));
 
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IMemberService, MemberService>();
 builder.Services.AddTransient<IAuthorService, AuthorService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();

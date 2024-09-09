@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OnlineLibrary.Domain;
 using OnlineLibrary.Domain.Identity;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;
@@ -16,6 +17,7 @@ namespace OnlineLibrary.Repository
         public DbSet<BorrowingHistory> BorrowingHistories { get; set; }
         public DbSet<BookInBorrowingCart> BookInBorrowingCarts { get; set; }
         public DbSet<BookInBorrowingHistory> BookInBorrowingHistories { get; set; }
+        //public DbSet<EmailMessage> EmailMessages { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
