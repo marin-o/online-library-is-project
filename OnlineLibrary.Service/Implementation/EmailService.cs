@@ -39,7 +39,7 @@ namespace OnlineLibrary.Service.Implementation
             {
                 using (var smtp = new MailKit.Net.Smtp.SmtpClient())
                 {
-                    var socketOptions = SecureSocketOptions.Auto;
+                    var socketOptions = _mailSettings.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto;
 
                     await smtp.ConnectAsync(_mailSettings.SmtpServer, 587, socketOptions);
 

@@ -25,6 +25,18 @@ builder.Services.AddDefaultIdentity<Member>(options => options.SignIn.RequireCon
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
+var stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+if (!string.IsNullOrEmpty(stripeSecretKey))
+{
+    stripeSettings.SecretKey = stripeSecretKey;
+}
+builder.Services.Configure<StripeSettings>(options =>
+{
+    options.PublishableKey = stripeSettings.PublishableKey;
+    options.SecretKey = stripeSettings.SecretKey;
+});
+
 var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
 var smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 if (!string.IsNullOrEmpty(smtpPassword))
