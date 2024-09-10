@@ -49,7 +49,7 @@ namespace AdminApplication.Controllers
         {
             HttpClient client = new HttpClient();
 
-            string URL = "https://localhost:44374/api/Admin/GetDetails";
+            string URL = "https://localhost:44374/api/Admin/GetDetailsForBorrowingHistory";
             var model = new
             {
                 Id = id
@@ -76,7 +76,7 @@ namespace AdminApplication.Controllers
                 
             }
             document.Content.Replace("{{BookList}}", sb.ToString());
-            document.Content.Replace("{{TotalBooks}}", total.ToString() + "$");
+            document.Content.Replace("{{TotalBooks}}", total.ToString());
 
             var stream = new MemoryStream();
             document.Save(stream, new PdfSaveOptions());
@@ -85,7 +85,7 @@ namespace AdminApplication.Controllers
         }
 
         [HttpGet]
-        public FileContentResult ExportAllBorrowingHistorys()
+        public FileContentResult ExportAllBorrowingHistories()
         {
             string fileName = "BorrowingHistorys.xlsx";
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
