@@ -11,8 +11,9 @@ namespace OnlineLibrary.Service.Interface
     {
         List<Notification> GetAllNotifications();
         Notification GetDetailsForNotification(Guid? id);
-        void CreateNewNotification(Notification b);
+        void CreateNewNotification(Book b);
         void UpdeteExistingNotification(Notification b);
         void DeleteNotification(Guid id);
+        List<Notification> GetLatestNotifications(int count);
     }
 }

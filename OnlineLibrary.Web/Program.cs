@@ -9,6 +9,9 @@ using OnlineLibrary.Service.Implementation;
 using Stripe.Climate;
 using Microsoft.AspNetCore.Identity;
 using OnlineLibrary.Domain;
+using OnlineLibrary.Domain.Models.BaseModels;
+using Stripe;
+using Microsoft.AspNetCore.Hosting.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +70,8 @@ builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<ICategorySevice, CategoryService>();
 builder.Services.AddTransient<IBorrowingCartService, BorrowingCartService>();
 builder.Services.AddTransient<IBorrowingHistoryService, BorrowingHistoryService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRepository<Notification>, Repository<Notification>>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

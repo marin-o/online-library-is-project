@@ -11,36 +11,50 @@ namespace OnlineLibrary.Service.Implementation
 {
     public class NotificationService : INotificationService
     { 
-        private readonly IRepository<Notification> _NotificationRepository;
+        private readonly IRepository<Notification> _notificationRepository;
 
         public NotificationService(IRepository<Notification> NotificationRepository)
         {
-            _NotificationRepository = NotificationRepository;
+            _notificationRepository = NotificationRepository;
         }
-        public void CreateNewNotification(Notification p)
+        public void CreateNewNotification(Book b)
         {
-            _NotificationRepository.Insert(p);
+            var notification = new Notification
+            {
+                BookId = b.Id,
+                Book = b,
+                Date = DateTime.Now
+            };
+            _notificationRepository.Insert(notification);
         }
 
         public void DeleteNotification(Guid id)
         {
-            var Notification = _NotificationRepository.Get(id);
-            _NotificationRepository.Delete(Notification);
+            var Notification = _notificationRepository.Get(id);
+            _notificationRepository.Delete(Notification);
         }
 
         public List<Notification> GetAllNotifications()
         {
-            return _NotificationRepository.GetAll().ToList();
+            return _notificationRepository.GetAll().ToList();
         }
 
         public Notification GetDetailsForNotification(Guid? id)
         {
-            return _NotificationRepository.Get(id);
+            return _notificationRepository.Get(id);
+        }
+
+        public List<Notification> GetLatestNotifications(int count)
+        {
+            return _notificationRepository.GetAll()
+                .OrderByDescending(n => n.Date)
+                .Take(count)
+                .ToList();
         }
 
         public void UpdeteExistingNotification(Notification p)
         {
-            _NotificationRepository.Update(p);
+            _notificationRepository.Update(p);
         }
     }
 }
