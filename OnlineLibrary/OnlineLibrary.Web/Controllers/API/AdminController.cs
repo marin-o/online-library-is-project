@@ -49,6 +49,7 @@ namespace OnlineLibrary.Web.Controllers.API
                         Email = user.Email,
                         UserName = user.Email,
                         NormalizedEmail = user.Email,
+                        EmailConfirmed = true,
                         BorrowingCart = new BorrowingCart()
                     };
                     var result = userManager.CreateAsync(neww, user.Password).Result;
