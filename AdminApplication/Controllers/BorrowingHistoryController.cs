@@ -16,7 +16,7 @@ namespace AdminApplication.Controllers
         public IActionResult Index()
         {
             HttpClient client = new HttpClient();
-            string URL = "https://localhost:44374/api/Admin/GetAllBorrowingHistories";
+            string URL = "https://localhost:7139/api/Admin/GetAllBorrowingHistories";
 
             HttpResponseMessage response = client.GetAsync(URL).Result;
             var data = response.Content.ReadAsAsync<List<BorrowingHistory>>().Result;
@@ -27,7 +27,7 @@ namespace AdminApplication.Controllers
         {
             HttpClient client = new HttpClient();
             //added in next aud
-            string URL = "https://localhost:44374/api/Admin/GetDetailsForBorrowingHistory";
+            string URL = "https://localhost:7139/api/Admin/GetDetailsForBorrowingHistory";
             var model = new
             {
                 Id = id
@@ -49,7 +49,7 @@ namespace AdminApplication.Controllers
         {
             HttpClient client = new HttpClient();
 
-            string URL = "https://localhost:44374/api/Admin/GetDetailsForBorrowingHistory";
+            string URL = "https://localhost:7139/api/Admin/GetDetailsForBorrowingHistory";
             var model = new
             {
                 Id = id
@@ -97,7 +97,7 @@ namespace AdminApplication.Controllers
                 worksheet.Cell(1, 2).Value = "Member UserName";
                 worksheet.Cell(1, 3).Value = "Total Books Borrowed";
                 HttpClient client = new HttpClient();
-                string URL = "https://localhost:44374/api/Admin/GetAllBorrowingHistories";
+                string URL = "https://localhost:7139/api/Admin/GetAllBorrowingHistories";
 
                 HttpResponseMessage response = client.GetAsync(URL).Result;
                 var data = response.Content.ReadAsAsync<List<BorrowingHistory>>().Result;

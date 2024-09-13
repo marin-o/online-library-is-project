@@ -1,10 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model List<AdminApplication.Models.BorrowingHistory>
-
+﻿@model List<AdminApplication.Models.BorrowingHistory>
 
 <div class="container">
     <div class="row">
@@ -15,44 +9,37 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>
-                        #
-                    </th>
-                    <th>
-                        Customer details
-                    </th>
-                    <th>
-                        Number of books
-                    </th>
+                    <th>#</th>
+                    <th>Customer details</th>
+                    <th>Number of books</th>
                     <th></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < Model.Count(); i++)
+                @{
+                    // Sorting the orders based on specified criteria
+                    var sortedOrders = Model
+                    .OrderByDescending(order => order.Books?.Any(book => !book.Returned) == true) // Orders with unreturned books first
+                    .ThenByDescending(order => order.Books?.Any() == true) // Orders with at least one book next
+                    .ToList();
+                }
+                @for (int i = 0; i < sortedOrders.Count(); i++)
                 {
-                    var item = Model[i];
+                    var item = sortedOrders[i];
                     <tr>
                         <td>@(i + 1)</td>
+                        <td>@item.Member?.UserName</td>
+                        <td>@item.Books?.Count()</td>
                         <td>
-                            @item.Member?.UserName
-                        </td>
-
-                        <td>
-                            @item.Books?.Count()
-                        </td>
-                        <td>
-                            |
                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">View Borrowing</a>
                         </td>
                         <td>
-                            |
                             <a asp-action="CreateInvoice" asp-route-id="@item.Id" class="btn btn-info">Create Invoice</a>
                         </td>
                     </tr>
                 }
             </tbody>
-
         </table>
     </div>
 </div>
