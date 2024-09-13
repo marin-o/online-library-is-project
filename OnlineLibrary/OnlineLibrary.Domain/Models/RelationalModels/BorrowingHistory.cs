@@ -13,5 +13,6 @@ namespace OnlineLibrary.Domain.Models.RelationalModels
         public string? MemberId{ get; set; }
         public Member? Member { get; set; }
         public List<BookInBorrowingHistory>? Books { get; set; }
+        public DateTime BorrowDate { get; set; }
     }
 }

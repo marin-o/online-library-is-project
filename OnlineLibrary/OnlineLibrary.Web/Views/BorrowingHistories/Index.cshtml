@@ -23,7 +23,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Books[0].BorrowedAt)
+                @Html.DisplayFor(modelItem => item.BorrowDate)
             </td>
             <td>
                     @item.Books.Count(b => !b.Returned) 

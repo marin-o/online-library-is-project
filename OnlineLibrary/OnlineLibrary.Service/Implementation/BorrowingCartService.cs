@@ -99,7 +99,8 @@ namespace OnlineLibrary.Service.Implementation
                 {
                     Id = Guid.NewGuid(),
                     MemberId = memberId,
-                    Member = loggedInUser
+                    Member = loggedInUser,
+                    BorrowDate = DateTime.Now
                 };
 
                 _borrowingHistoryRepository.Insert(borrowingHistory);
