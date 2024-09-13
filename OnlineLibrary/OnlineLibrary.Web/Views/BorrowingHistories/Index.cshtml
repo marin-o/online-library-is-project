@@ -11,7 +11,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Member)
+                Borrowed At
+            </th>
+            <th>
+                Remaining books to return
             </th>
             <th></th>
         </tr>
@@ -20,7 +23,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Member.Id)
+                @Html.DisplayFor(modelItem => item.Books[0].BorrowedAt)
+            </td>
+            <td>
+                    @item.Books.Count(b => !b.Returned) 
             </td>
             <td>
                 <a asp-action="ReturnBooks" asp-route-id="@item.Id">View</a>

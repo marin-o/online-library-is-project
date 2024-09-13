@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OnlineLibrary.Domain;
 using OnlineLibrary.Domain.Identity;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;

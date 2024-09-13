@@ -1,4 +1,5 @@
 ﻿using EShop.Repository.Interface;
+using OnlineLibrary.Domain;
 using OnlineLibrary.Domain.DTO;
 using OnlineLibrary.Domain.Models.BaseModels;
 using OnlineLibrary.Domain.Models.RelationalModels;
@@ -22,8 +23,9 @@ namespace OnlineLibrary.Service.Implementation
         private readonly IRepository<BookInBorrowingCart> _bookInBorrowingCartRepository;
         private readonly IRepository<BookInBorrowingHistory> _bookInBorrowingHistoryRepository;
         private readonly IMemberRepository _userRepository;
+        private readonly IEmailService emailService;
 
-        public BorrowingCartService(IBorrowingCartRepository borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IMemberRepository userRepository)
+        public BorrowingCartService(IBorrowingCartRepository borrowingCartRepository, IRepository<Book> bookRepository, IRepository<BorrowingHistory> borrowingHistoryRepository, IRepository<BookInBorrowingCart> bookInBorrowingCartRepository, IRepository<BookInBorrowingHistory> bookInBorrowingHistoryRepository, IMemberRepository userRepository, IEmailService emailService)
         {
             _borrowingCartRepository = borrowingCartRepository;
             _bookRepository = bookRepository;
@@ -31,6 +33,7 @@ namespace OnlineLibrary.Service.Implementation
             _bookInBorrowingCartRepository = bookInBorrowingCartRepository;
             _bookInBorrowingHistoryRepository = bookInBorrowingHistoryRepository;
             _userRepository = userRepository;
+            this.emailService = emailService;
         }
 
         public bool AddBookToBorrowingCart(BookInBorrowingCart model, string userId)
@@ -70,6 +73,10 @@ namespace OnlineLibrary.Service.Implementation
 
                 // List to store books that are unavailable
                 List<Book> unavailableBooks = new List<Book>();
+
+                EmailMessage message = new EmailMessage();
+                message.Subject = "Borrowing Confirmation";
+                message.MailTo = loggedInUser.Email;
 
                 // Check if each book has enough quantity
                 foreach (var item in userBorrowingHistory.Books)
@@ -112,6 +119,18 @@ namespace OnlineLibrary.Service.Implementation
                     }
                 ).ToList();
 
+                StringBuilder sb = new StringBuilder();
+                sb.Append("You have successfully borrowed the following books: \n");
+                float cost = 0f;
+                foreach (var book in lista)
+                {
+                    sb.Append(book.Book.Title + "\n");
+                    cost += 0.5f;
+                }
+                sb.AppendLine("Please return the books within 14 days.");
+                sb.AppendLine("Cost: 0.5$ per book.");
+                message.Content = sb.ToString();
+
                 // Now decrease the quantity of each book
                 foreach (var bookInList in lista)
                 {
@@ -129,7 +148,7 @@ namespace OnlineLibrary.Service.Implementation
 
                 loggedInUser.BorrowingCart.Books.Clear();
                 _userRepository.Update(loggedInUser);
-
+                emailService.SendEmailAsync(message);
                 return (true, null); // Borrowing successful, no unavailable books
             }
             return (false, null); // Failed due to null memberId

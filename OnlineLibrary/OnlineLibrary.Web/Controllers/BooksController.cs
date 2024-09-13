@@ -16,13 +16,15 @@ namespace OnlineLibrary.Web.Controllers
         private readonly IBorrowingCartService borrowingCartService;
         private readonly IAuthorService authorService;
         private readonly ICategorySevice categoryService;
+        private readonly INotificationService notificationService;
 
-        public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService, IAuthorService authorService, ICategorySevice categoryService)
+        public BooksController(IBookService bookService, IBorrowingCartService borrowingCartService, IAuthorService authorService, ICategorySevice categoryService, INotificationService notificationService)
         {
             this.bookService = bookService;
             this.borrowingCartService = borrowingCartService;
             this.authorService = authorService;
             this.categoryService = categoryService;
+            this.notificationService = notificationService;
         }
 
         public IActionResult Index()
@@ -63,6 +65,7 @@ namespace OnlineLibrary.Web.Controllers
                 book.Author = authorService.GetDetailsForAuthor(book.AuthorId);
                 book.Category = categoryService.GetDetailsForCategory(book.CategoryId);
                 bookService.CreateNewBook(book);
+                notificationService.CreateNewNotification(book);
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
