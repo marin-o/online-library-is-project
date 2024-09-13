@@ -13,5 +13,6 @@ namespace AdminApplication.Models
         public string? MemberId{ get; set; }
         public LibraryMember? Member { get; set; }
         public List<BookInBorrowingHistory>? Books { get; set; }
+        public DateTime BorrowDate{ get; set; }
     }
 }
