@@ -1,4 +1,6 @@
 ﻿@model OnlineLibrary.Domain.DTO.BorrowingCartDTO
+﻿@using Microsoft.Extensions.Options
+@inject IOptions<StripeSettings> Stripe
 
 @{
     ViewData["Title"] = "My Borrowing Cart";
@@ -6,7 +8,20 @@
 }
 
 <h1>My Borrowing Cart</h1>
-<a asp-action="Borrow">Borrow</a>
+@if (Model.NumBorrowedBooks > 0){
+<form asp-controller="BorrowingCarts" asp-action="PayOrder" method="post">
+    <article>
+        <script src="https://checkout.stripe.com/checkout.js"
+                class="stripe-button"
+                data-key="@Stripe.Value.PublishableKey"
+                data-locale="auto"
+                data-description="EShop Application Payment"
+                data-amount="@(Math.Max(1.0,Model.NumBorrowedBooks * 0.5) * 100)"
+                    data-label="Pay $@(Math.Max(1.0, Model.NumBorrowedBooks * 0.5))">
+        </script>
+    </article>
+</form>
+}
 @if (Model.BooksInCart != null && Model.BooksInCart.Any())
 {
     <table class="table">

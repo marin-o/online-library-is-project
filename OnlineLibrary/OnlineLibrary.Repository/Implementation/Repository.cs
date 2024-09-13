@@ -31,6 +31,14 @@ namespace OnlineLibrary.Repository.Implementation
                     .Include("Category")
                     .AsEnumerable();
             }
+            else if(typeof(T).IsAssignableFrom(typeof(Notification)))
+            {
+                return entities
+                    .Include("Book")
+                    .Include("Book.Author")
+                    .Include("Book.Category")
+                    .AsEnumerable();
+            }
             else
             {
                 return entities.AsEnumerable();
