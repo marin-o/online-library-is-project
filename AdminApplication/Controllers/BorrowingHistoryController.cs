@@ -73,15 +73,15 @@ namespace AdminApplication.Controllers
                 document.Content.Replace("{{UserName}}", result?.Member?.UserName);
 
                 StringBuilder stringBuilder = new StringBuilder();
-                var ttl = result.Books?.Count;
+                var total = result.Books?.Count;
                 foreach (var item in result.Books)
                 {
                     stringBuilder.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
-                        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
+                        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and " + (item.Returned ? "returned at " : "has not yet been returned.") + (item.Returned ? item.ReturnedAt.ToString() : ""));
 
                 }
                 document.Content.Replace("{{BookList}}", stringBuilder.ToString());
-                document.Content.Replace("{{TotalBooks}}", ttl.ToString());
+                document.Content.Replace("{{TotalBooks}}", total.ToString());
 
                 var strm = new MemoryStream();
                 document.Save(strm, new PdfSaveOptions());
