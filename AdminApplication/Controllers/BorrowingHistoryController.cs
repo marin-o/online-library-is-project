@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using GemBox.Document;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Reflection;
 using System.Text;
 
 namespace AdminApplication.Controllers
@@ -11,7 +12,7 @@ namespace AdminApplication.Controllers
     {
         public BorrowingHistoryController()
         {
-            ComponentInfo.SetLicense("FREE-LIMITED-KEY");
+            GemBox.Document.ComponentInfo.SetLicense("FREE-LIMITED-KEY");
         }
         public IActionResult Index()
         {
@@ -61,26 +62,52 @@ namespace AdminApplication.Controllers
 
             var result = response.Content.ReadAsAsync<BorrowingHistory>().Result;
 
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Invoice.docx");
-            var document = DocumentModel.Load(templatePath);
+            var assembly = Assembly.GetExecutingAssembly();
+            var resource = "AdminApplication.Invoice.docx";
 
-            document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
-            document.Content.Replace("{{UserName}}", result?.Member?.UserName);
-
-            StringBuilder sb = new StringBuilder();
-            var total = result.Books?.Count;
-            foreach (var item in result.Books)
+            using (var stream = assembly.GetManifestResourceStream(resource))
             {
-                sb.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
-                    + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
-                
-            }
-            document.Content.Replace("{{BookList}}", sb.ToString());
-            document.Content.Replace("{{TotalBooks}}", total.ToString());
+                var document = DocumentModel.Load(stream, GemBox.Document.LoadOptions.DocxDefault);
 
-            var stream = new MemoryStream();
-            document.Save(stream, new PdfSaveOptions());
-            return File(stream.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
+                document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
+                document.Content.Replace("{{UserName}}", result?.Member?.UserName);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                var ttl = result.Books?.Count;
+                foreach (var item in result.Books)
+                {
+                    stringBuilder.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
+                        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
+
+                }
+                document.Content.Replace("{{BookList}}", stringBuilder.ToString());
+                document.Content.Replace("{{TotalBooks}}", ttl.ToString());
+
+                var strm = new MemoryStream();
+                document.Save(strm, new PdfSaveOptions());
+                return File(strm.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
+            }
+
+            //var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Invoice.docx");
+            //var document = DocumentModel.Load(templatePath);
+
+            //document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
+            //document.Content.Replace("{{UserName}}", result?.Member?.UserName);
+
+            //StringBuilder sb = new StringBuilder();
+            //var total = result.Books?.Count;
+            //foreach (var item in result.Books)
+            //{
+            //    sb.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
+            //        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
+                
+            //}
+            //document.Content.Replace("{{BookList}}", sb.ToString());
+            //document.Content.Replace("{{TotalBooks}}", total.ToString());
+
+            //var stream = new MemoryStream();
+            //document.Save(stream, new PdfSaveOptions());
+            //return File(stream.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
 
         }
 
