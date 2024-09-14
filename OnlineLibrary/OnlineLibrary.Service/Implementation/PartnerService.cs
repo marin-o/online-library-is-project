@@ -12,7 +12,7 @@ public class PartnerService : IPartnerService
         _connectionString = configuration.GetConnectionString("PartnerConnection") ?? throw new System.ArgumentNullException(nameof(configuration));
     }
 
-    public IEnumerable<Book> GetPartnerBooksAsync()
+    public IEnumerable<Book> GetPartnerBooks()
     {
         using (var connection = new SqlConnection(_connectionString))
         {

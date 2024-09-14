@@ -15,7 +15,7 @@ namespace OnlineLibrary.Web.Controllers
 
         public IActionResult Index()
         {
-            var books = partnerService.GetPartnerBooksAsync();
+            var books = partnerService.GetPartnerBooks();
 
             return View(books);
         }

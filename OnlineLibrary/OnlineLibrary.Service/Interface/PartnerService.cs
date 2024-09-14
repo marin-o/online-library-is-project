@@ -5,5 +5,5 @@ using OnlineLibrary.Domain.Models.BaseModels;
 
 public interface IPartnerService
 {
-    public IEnumerable<Book> GetPartnerBooksAsync();
+    public IEnumerable<Book> GetPartnerBooks();
 }
