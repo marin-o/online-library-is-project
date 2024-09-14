@@ -33,10 +33,15 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
+var stripePublishableKey = Environment.GetEnvironmentVariable("STRIPE_PUBLISHABLE_KEY");
 var stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 if (!string.IsNullOrEmpty(stripeSecretKey))
 {
     stripeSettings.SecretKey = stripeSecretKey;
+}
+if (!string.IsNullOrEmpty(stripePublishableKey))
+{
+    stripeSettings.PublishableKey = stripePublishableKey;
 }
 builder.Services.Configure<StripeSettings>(options =>
 {
