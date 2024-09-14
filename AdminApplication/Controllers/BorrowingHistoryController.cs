@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using GemBox.Document;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Reflection;
 using System.Text;
 
 namespace AdminApplication.Controllers
@@ -11,12 +12,12 @@ namespace AdminApplication.Controllers
     {
         public BorrowingHistoryController()
         {
-            ComponentInfo.SetLicense("FREE-LIMITED-KEY");
+            GemBox.Document.ComponentInfo.SetLicense("FREE-LIMITED-KEY");
         }
         public IActionResult Index()
         {
             HttpClient client = new HttpClient();
-            string URL = "https://localhost:7139/api/Admin/GetAllBorrowingHistories";
+            string URL = "https://onlinelibraryintegratedsystems.azurewebsites.net/api/Admin/GetAllBorrowingHistories";
 
             HttpResponseMessage response = client.GetAsync(URL).Result;
             var data = response.Content.ReadAsAsync<List<BorrowingHistory>>().Result;
@@ -27,7 +28,7 @@ namespace AdminApplication.Controllers
         {
             HttpClient client = new HttpClient();
             //added in next aud
-            string URL = "https://localhost:7139/api/Admin/GetDetailsForBorrowingHistory";
+            string URL = "https://onlinelibraryintegratedsystems.azurewebsites.net/api/Admin/GetDetailsForBorrowingHistory";
             var model = new
             {
                 Id = id
@@ -49,7 +50,7 @@ namespace AdminApplication.Controllers
         {
             HttpClient client = new HttpClient();
 
-            string URL = "https://localhost:7139/api/Admin/GetDetailsForBorrowingHistory";
+            string URL = "https://onlinelibraryintegratedsystems.azurewebsites.net/api/Admin/GetDetailsForBorrowingHistory";
             var model = new
             {
                 Id = id
@@ -61,26 +62,52 @@ namespace AdminApplication.Controllers
 
             var result = response.Content.ReadAsAsync<BorrowingHistory>().Result;
 
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Invoice.docx");
-            var document = DocumentModel.Load(templatePath);
+            var assembly = Assembly.GetExecutingAssembly();
+            var resource = "AdminApplication.Invoice.docx";
 
-            document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
-            document.Content.Replace("{{UserName}}", result?.Member?.UserName);
-
-            StringBuilder sb = new StringBuilder();
-            var total = result.Books?.Count;
-            foreach (var item in result.Books)
+            using (var stream = assembly.GetManifestResourceStream(resource))
             {
-                sb.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
-                    + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
-                
-            }
-            document.Content.Replace("{{BookList}}", sb.ToString());
-            document.Content.Replace("{{TotalBooks}}", total.ToString());
+                var document = DocumentModel.Load(stream, GemBox.Document.LoadOptions.DocxDefault);
 
-            var stream = new MemoryStream();
-            document.Save(stream, new PdfSaveOptions());
-            return File(stream.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
+                document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
+                document.Content.Replace("{{UserName}}", result?.Member?.UserName);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                var total = result.Books?.Count;
+                foreach (var item in result.Books)
+                {
+                    stringBuilder.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
+                        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and " + (item.Returned ? "returned at " : "has not yet been returned.") + (item.Returned ? item.ReturnedAt.ToString() : ""));
+
+                }
+                document.Content.Replace("{{BookList}}", stringBuilder.ToString());
+                document.Content.Replace("{{TotalBooks}}", total.ToString());
+
+                var strm = new MemoryStream();
+                document.Save(strm, new PdfSaveOptions());
+                return File(strm.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
+            }
+
+            //var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Invoice.docx");
+            //var document = DocumentModel.Load(templatePath);
+
+            //document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
+            //document.Content.Replace("{{UserName}}", result?.Member?.UserName);
+
+            //StringBuilder sb = new StringBuilder();
+            //var total = result.Books?.Count;
+            //foreach (var item in result.Books)
+            //{
+            //    sb.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
+            //        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
+                
+            //}
+            //document.Content.Replace("{{BookList}}", sb.ToString());
+            //document.Content.Replace("{{TotalBooks}}", total.ToString());
+
+            //var stream = new MemoryStream();
+            //document.Save(stream, new PdfSaveOptions());
+            //return File(stream.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
 
         }
 
@@ -97,7 +124,7 @@ namespace AdminApplication.Controllers
                 worksheet.Cell(1, 2).Value = "Member UserName";
                 worksheet.Cell(1, 3).Value = "Total Books Borrowed";
                 HttpClient client = new HttpClient();
-                string URL = "https://localhost:7139/api/Admin/GetAllBorrowingHistories";
+                string URL = "https://onlinelibraryintegratedsystems.azurewebsites.net/api/Admin/GetAllBorrowingHistories";
 
                 HttpResponseMessage response = client.GetAsync(URL).Result;
                 var data = response.Content.ReadAsAsync<List<BorrowingHistory>>().Result;
