@@ -15,7 +15,7 @@ namespace AdminApplication.Controllers
 
         public IActionResult ImportMembers(IFormFile file)
         {
-            string pathToUpload = $"{Directory.GetCurrentDirectory()}\\files\\{file.FileName}";
+            string pathToUpload = $"{Path.GetTempPath()}\\{file.FileName}";
 
             using (FileStream fileStream = System.IO.File.Create(pathToUpload))
             {
@@ -25,7 +25,7 @@ namespace AdminApplication.Controllers
 
             List<Member> users = getAllMembersFromFile(file.FileName);
             HttpClient client = new HttpClient();
-            string URL = "https://localhost:44374/api/Admin/ImportAllUsers";
+            string URL = "https://onlinelibraryintegratedsystems.azurewebsites.net/api/Admin/ImportAllUsers";
 
             HttpContent content = new StringContent(JsonConvert.SerializeObject(users), Encoding.UTF8, "application/json");
 
@@ -40,7 +40,7 @@ namespace AdminApplication.Controllers
         private List<Member> getAllMembersFromFile(string fileName)
         {
             List<Member> members = new List<Member>();
-            string filePath = $"{Directory.GetCurrentDirectory()}\\files\\{fileName}";
+            string filePath = $"{Path.GetTempPath()}\\{fileName}";
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
