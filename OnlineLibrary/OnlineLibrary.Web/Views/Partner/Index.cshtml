@@ -19,7 +19,7 @@
                 <div class="card">
                     <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title">
                     <div class="card-body">
-                        <h5 class="card-title">@item.Title</h5>
+                        <h5 class="card-title">@Html.Raw(item.Title)</h5>
                         <p class="card-text">ISBN: @item.ISBN</p>
                     </div>
                 </div>
