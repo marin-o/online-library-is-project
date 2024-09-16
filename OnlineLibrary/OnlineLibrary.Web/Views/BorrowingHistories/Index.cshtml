@@ -20,18 +20,19 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.BorrowDate)
-            </td>
-            <td>
-                    @item.Books.Count(b => !b.Returned) 
-            </td>
-            <td>
-                <a asp-action="ReturnBooks" asp-route-id="@item.Id">View</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.OrderByDescending(m => m.Books.Count(b => !b.Returned)))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BorrowDate)
+                </td>
+                <td>
+                    @item.Books.Count(b => !b.Returned)
+                </td>
+                <td>
+                    <a asp-action="ReturnBooks" asp-route-id="@item.Id">View</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
