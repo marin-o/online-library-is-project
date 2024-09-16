@@ -88,26 +88,6 @@ namespace AdminApplication.Controllers
                 return File(strm.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
             }
 
-            //var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Invoice.docx");
-            //var document = DocumentModel.Load(templatePath);
-
-            //document.Content.Replace("{{BorrowingHistoryNumber}}", result?.Id.ToString());
-            //document.Content.Replace("{{UserName}}", result?.Member?.UserName);
-
-            //StringBuilder sb = new StringBuilder();
-            //var total = result.Books?.Count;
-            //foreach (var item in result.Books)
-            //{
-            //    sb.AppendLine("The book " + item.Book?.Title + " from author " + item.Book?.Author?.Name + " from category " + item.Book?.Category?.Name
-            //        + ", was borrowed on " + item.BorrowedAt.ToString() + ", and returned at " + item.ReturnedAt.ToString());
-                
-            //}
-            //document.Content.Replace("{{BookList}}", sb.ToString());
-            //document.Content.Replace("{{TotalBooks}}", total.ToString());
-
-            //var stream = new MemoryStream();
-            //document.Save(stream, new PdfSaveOptions());
-            //return File(stream.ToArray(), new PdfSaveOptions().ContentType, "ExportInvoice.pdf");
 
         }
 
